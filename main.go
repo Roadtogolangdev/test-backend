@@ -3,19 +3,22 @@ package main
 import (
 	"Test-backend/banner"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
 func main() {
-	bannerService := banner.NewBanner()
+	router := httprouter.New()
+	bannerService := banner.NewBannerService()
 
-	http.HandleFunc("/user_banner", func(w http.ResponseWriter, r *http.Request) {
+	router.GET("/user_banner", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		banner.UserBannerHandler(w, r, bannerService)
 	})
-	http.HandleFunc("/banner", func(w http.ResponseWriter, r *http.Request) {
+
+	router.GET("/banner", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		banner.BannerHandler(w, r, bannerService)
 	})
 
 	fmt.Println("Server is running on port 8080...")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", router)
 }
