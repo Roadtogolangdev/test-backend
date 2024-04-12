@@ -22,7 +22,6 @@ type BannerService struct {
 }
 
 func NewBannerService() *BannerService {
-	// инициализируем список баннеров
 	banners := make([]Banner, 0)
 	return &BannerService{
 		banners: banners,
