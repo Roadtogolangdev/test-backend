@@ -19,6 +19,18 @@ func main() {
 		banner.BannerHandler(w, r, bannerService)
 	})
 
+	router.POST("/banner", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		banner.BannerHandler(w, r, bannerService)
+	})
+
+	router.PATCH("/banner/:id", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		banner.BannerHandler(w, r, bannerService)
+	})
+
+	router.DELETE("/banner/:id", func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		banner.BannerHandler(w, r, bannerService)
+	})
+
 	fmt.Println("Server is running on port 8080...")
 	err := http.ListenAndServe(":8080", router)
 	if err != nil {
