@@ -1,30 +1,11 @@
-package main
+package banner
 
 import (
-	"database/sql"
-	"encoding/json"
 	"errors"
-	"net/http"
-	"strconv"
 	"time"
 )
 
-type Banner struct {
-	ID        int                    `json:"banner_id"`
-	TagIDs    []int                  `json:"tag_ids"`
-	FeatureID int                    `json:"feature_id"`
-	Content   map[string]interface{} `json:"content"`
-	IsActive  bool                   `json:"is_active"`
-	CreatedAt time.Time              `json:"created_at"`
-	UpdatedAt time.Time              `json:"updated_at"`
-}
-
-type BannerService struct {
-	db      *sql.DB
-	banners []Banner // добавляем список баннеров для примера
-}
-
-func NewBannerService() *BannerService {
+func NewBanner() *BannerService {
 	// инициализируем список баннеров
 	banners := make([]Banner, 0)
 	return &BannerService{
@@ -120,7 +101,6 @@ func (s *BannerService) deleteBanner(adminToken string, id int) error {
 	s.banners = append(s.banners[:index], s.banners[index+1:]...)
 	return nil
 }
-
 func (s *BannerService) findBannerByID(id int) (*Banner, error) {
 	for _, banner := range s.banners {
 		if banner.ID == id {
@@ -137,43 +117,4 @@ func (s *BannerService) findIndexByID(id int) (int, error) {
 		}
 	}
 	return -1, errors.New("banner not found")
-}
-
-func userBannerHandler(w http.ResponseWriter, r *http.Request, bannerService *BannerService) {
-	tagID, err := strconv.Atoi(r.URL.Query().Get("tag_id"))
-	if err != nil {
-		http.Error(w, "Invalid tag ID", http.StatusBadRequest)
-		return
-	}
-
-	featureID, err := strconv.Atoi(r.URL.Query().Get("feature_id"))
-	if err != nil {
-		http.Error(w, "Invalid feature ID", http.StatusBadRequest)
-		return
-	}
-
-	useLastRevision, err := strconv.ParseBool(r.URL.Query().Get("use_last_revision"))
-	if err != nil {
-		useLastRevision = false
-	}
-
-	token := r.Header.Get("token")
-	if token == "" {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Получение баннера для пользователя
-	banner, err := bannerService.getUserBanner(tagID, featureID, useLastRevision)
-	if err != nil {
-		http.Error(w, "Failed to get user banner", http.StatusInternalServerError)
-		return
-	}
-
-	if banner == nil {
-		http.Error(w, "Banner not found", http.StatusNotFound)
-		return
-	}
-
-	json.NewEncoder(w).Encode(banner)
 }
