@@ -17,5 +17,6 @@ type Banner struct {
 
 type BannerService struct {
 	db      *sql.DB
-	banners []Banner // добавляем список баннеров для примера
+	banners []Banner
+	//add some banner
 }
